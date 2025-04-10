@@ -85,21 +85,14 @@ app.get('/fetchDealers/:state', async (req, res) => {
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
 //Write your code here
- try {
-    const id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: 'Invalid ID format' });
-    }
-    const document = await Dealerships.findById(id);
-    if (!document) {
-      return res.status(404).json({ error: 'Dealer not found' });
-    }
-    res.json(document);
-  } catch (error) {
-    console.error(error); // helpful for debugging
-    res.status(500).json({ error: 'Error fetching document' });
-  }
+try {
+  const documents = await Dealerships.find({ id: req.params.id });
+  res.json(documents);
+} catch (error) {
+  res.status(500).json({ error: 'Error fetching documents' });
+}
 });
+
 
 //Express route to insert review
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {

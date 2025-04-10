@@ -57,7 +57,7 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 });
 
 
-// Express route to fetch all dealerships (not working?)
+// Express route to fetch all dealerships (works)
 app.get('/fetchDealers', async (req, res) => {
 //Write your code here
   try {
@@ -71,7 +71,7 @@ app.get('/fetchDealers', async (req, res) => {
 
 
 // Express route to fetch Dealers by a particular state
-app.get('/fetchDealers/dealer/:state', async (req, res) => {
+app.get('/fetchDealers/:state', async (req, res) => {
 //Write your code here
   try {
     const documents = await Dealerships.find({dealership: req.params.state});
@@ -83,7 +83,7 @@ app.get('/fetchDealers/dealer/:state', async (req, res) => {
 
 
 // Express route to fetch dealer by a particular id
-app.get('/fetchDealers/dealer/:id', async (req, res) => {
+app.get('/fetchDealer/:id', async (req, res) => {
 //Write your code here
 try {
   const documents = await Dealerships.find({dealership: req.params.id});

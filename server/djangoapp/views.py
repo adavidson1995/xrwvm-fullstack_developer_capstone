@@ -14,6 +14,7 @@ import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
 from .populate import initiate
+from . import restapis
 
 
 # Get an instance of a logger
@@ -79,17 +80,51 @@ def registration(request):
 
 # # Update the `get_dealerships` view to render the index page with
 # a list of dealerships
-# def get_dealerships(request):
-# ...
+def get_dealerships(request):
+    if request.method == "GET":
+        url = "/fetchDealers"
+        # Get dealers from the URL
+        dealerships = restapis.get_request(url)
+        # Concat all dealer's short name
+        dealer_names = ' '.join([dealer["short_name"] for dealer in dealerships])
+        # Return a list of dealer short name
+        return HttpResponse(dealer_names)
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
-# def get_dealer_reviews(request,dealer_id):
-# ...
+def get_dealer_reviews(request, dealer_id):
+    if request.method == "GET":
+        url = f"/fetchReviews/dealer/{dealer_id}"
+        # Get reviews from the URL
+        reviews = restapis.get_request(url)
+        if reviews is not None:
+            # Return the reviews as JSON
+            return JsonResponse(reviews, safe=False)
+        else:
+            return JsonResponse({"error": "Reviews not found"}, status=404)
 
 # Create a `get_dealer_details` view to render the dealer details
-# def get_dealer_details(request, dealer_id):
-# ...
+def get_dealer_details(request, dealer_id):
+    if request.method == "GET":
+        url = f"/fetchDealer/{dealer_id}"
+        # Get dealer details from the URL
+        dealer_details = restapis.get_request(url)
+        if dealer_details:
+            # Return the first dealer details (since it's a list)
+            return JsonResponse(dealer_details[0])
+        else:
+            return JsonResponse({"error": "Dealer not found"}, status=404)
 
 # Create a `add_review` view to submit a review
-# def add_review(request):
-# ...
+@csrf_exempt
+def add_review(request):
+    if request.method == "POST":
+        # Get the review data from the request
+        data = json.loads(request.body)
+        # Post the review to the backend
+        result = restapis.post_review(data)
+        if result:
+            return JsonResponse({"status": "success", "message": "Review added successfully"})
+        else:
+            return JsonResponse({"status": "error", "message": "Failed to add review"}, status=500)
+    else:
+        return JsonResponse({"error": "Method not allowed"}, status=405)
